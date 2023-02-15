@@ -1,0 +1,27 @@
+{
+  "name": "fazzpay_be",
+  "version": "1.0.0",
+  "description": "api service for fazzpay project ,build with express and pstgresql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "backend",
+    "service",
+    "server",
+    "fazzpay"
+  ],
+  "author": "Rizky Fadil",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-jwt": "^8.4.1",
+    "pg": "^8.9.0",
+    "uuidv4": "^6.2.13"
+  }
+}
