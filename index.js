@@ -1,9 +1,7 @@
 const express = require("express");
 const app = express();
 const { urlencoded, json } = require("express");
-const db = require("./helper/connection");
 const router = require("./src/router/index");
-const { v4: uuidv4 } = require("uuid");
 var cors = require("cors");
 
 app.use(cors());
