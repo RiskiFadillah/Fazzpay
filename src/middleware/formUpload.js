@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 const storageOnline = new CloudinaryStorage({
   cloudinary: cloudinaryUpload,
   params: {
-    folder: "img-profile",
+    folder: "img-profile-users",
     format: async (req, file) => "png",
     public_id: (req, file) => new Date().getTime(),
   },

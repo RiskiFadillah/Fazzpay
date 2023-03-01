@@ -2,18 +2,38 @@ const db = require("../../helper/connection");
 const { v4: uuidv4 } = require("uuid");
 
 const usersModel = {
-  get: function (queryParams) {
-    console.log(queryParams);
+  // get: function (queryParams) {
+  //   console.log(queryParams);
+  //   return new Promise((resolve, reject) => {
+  //     db.query(`SELECT * FROM users WHERE first_name LIKE '%{}%'`, (err, result) => {
+  //       if (err) {
+  //         return reject(err.message);
+  //       } else {
+  //         return resolve(result.rows);
+  //       }
+  //     });
+  //   });
+  // },
+  get: (queryParams) => {
+    const { search = "", limit = "6", page = 1 } = queryParams;
     return new Promise((resolve, reject) => {
-      db.query(`SELECT * FROM users`, (err, result) => {
-        if (err) {
-          return reject(err.message);
-        } else {
-          return resolve(result.rows);
+      db.query(
+        `
+      SELECT * FROM users 
+      ${search ? `WHERE first_name ILIKE '%${search}%'` : ""}
+      GROUP BY id_users LIMIT ${limit} OFFSET ${(page - 1) * limit}
+      `,
+        (errorGetUsers, resultGetUsers) => {
+          if (errorGetUsers) {
+            console.log(errorGetUsers);
+            return reject(errorGetUsers.message);
+          }
+          return resolve(resultGetUsers.rows);
         }
-      });
+      );
     });
   },
+
   getDetail: (id_users) => {
     return new Promise((resolve, reject) => {
       db.query(

@@ -1,11 +1,29 @@
 const usersModel = require("../model/users.model");
 
 const usersController = {
+  // get: (req, res) => {
+  //   return usersModel
+  //     .get(req.query)
+  //     .then((result) => {
+  //       return res.status(200).send({ message: "success", data: result });
+  //     })
+  //     .catch((error) => {
+  //       return res.status(500).send({ message: error });
+  //     });
+  // },
   get: (req, res) => {
     return usersModel
       .get(req.query)
       .then((result) => {
-        return res.status(200).send({ message: "success", data: result });
+        if (result.length == 0) {
+          return res
+            .status(404)
+            .send({ data: result, message: `Data users empty!` });
+        }
+        return res.status(200).send({
+          data: result,
+          message: `Successfully get all data users!`,
+        });
       })
       .catch((error) => {
         return res.status(500).send({ message: error });
