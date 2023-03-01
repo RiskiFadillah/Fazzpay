@@ -60,7 +60,7 @@ const usersModel = {
                 }', phone_number='${
                   phone_number || dataRes.rows[0].phone_number
                 }',images='${
-                  file ? file.filename : dataRes.rows[0].images
+                  file ? file.path : dataRes.rows[0].images
                 }' WHERE id_users='${id_users}'`,
                 (error) => {
                   if (error) {
