@@ -5,9 +5,7 @@ const authController = require("../controller/auth.controller");
 
 router.post("/login", authController.login);
 router.post("/register", authController.register);
-// router.get("/users", authController.get);
-// router.get("/users/:id", authController.getDetail);
-// router.patch("/users/:id", authController.update);
-// router.patch("/users/topup/:id", authController.topup);
+router.patch("/createpin/:id_users", authController.createPin);
+router.post("/confirm-pin", authController.confirmPin);
 
 module.exports = router;

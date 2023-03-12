@@ -4,9 +4,9 @@ const transactionModel = require("../model/transaction.model");
 const transactionController = {
   getDetail: (req, res) => {
     return transactionModel
-      .getDetail(req.params.id)
+      .getDetail(req.query)
       .then((result) => {
-        return res.status(200).send({ message: "success", data: result });
+        return res.status(200).send({ message: "Success", data: result });
       })
       .catch((error) => {
         return res.status(500).send({ message: error });

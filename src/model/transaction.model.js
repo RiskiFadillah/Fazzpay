@@ -2,25 +2,30 @@ const db = require("../../helper/connection");
 const { v4: uuidv4 } = require("uuid");
 
 const transactionModel = {
-  getDetail: ({ id_sender, id_reciver }) => {
+  getDetail: () => {
     return new Promise((resolve, reject) => {
-      db.query(
-        `SELECT * from usersauth WHERE id='${id_sender}'`,
-        (err, result) => {
-          if (err) {
-            return reject(err.message);
-          } else {
-            return resolve(result.rows[0]);
-          }
+      db.query(`SELECT * from transaction`, (err, result) => {
+        console.log(result.rows);
+        if (err) {
+          return reject(err.message);
+        } else {
+          return resolve(result.rows);
         }
-      );
+      });
     });
   },
 
-  update: ({ id_sender, id_reciver, total_transaction }) => {
+  update: ({
+    id_sender,
+    id_reciver,
+    name_reciver,
+    total_transaction,
+    information,
+    date_hours,
+  }) => {
     return new Promise((resolve, reject) => {
       db.query(
-        `UPDATE usersauth SET balance = balance - $1 WHERE id = $2 `,
+        `UPDATE users SET balance = balance - $1 WHERE id_users = $2 `,
         [total_transaction, id_sender],
         (err, result) => {
           console.log(err, "1");
@@ -28,7 +33,7 @@ const transactionModel = {
             return reject(err.message);
           } else {
             db.query(
-              `UPDATE usersauth SET balance = balance + $1 WHERE id = $2`,
+              `UPDATE users SET balance = balance + $1 WHERE id_users = $2`,
               [total_transaction, id_reciver],
               (err, result) => {
                 console.log(err, "2");
@@ -36,8 +41,16 @@ const transactionModel = {
                   return reject(err.message);
                 } else {
                   db.query(
-                    `INSERT INTO transaction (id, id_sender, id_reciver, total_transaction) VALUES ($1,$2,$3,$4)`,
-                    [uuidv4(), id_sender, id_reciver, total_transaction],
+                    `INSERT INTO transaction (id, id_sender, id_reciver,name_reciver, total_transaction,information,date_hours) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+                    [
+                      uuidv4(),
+                      id_sender,
+                      id_reciver,
+                      name_reciver,
+                      total_transaction,
+                      information,
+                      date_hours,
+                    ],
                     (err, result) => {
                       console.log("ini result tf", result);
                       if (err) {
@@ -48,6 +61,8 @@ const transactionModel = {
                           id_sender,
                           id_reciver,
                           total_transaction,
+                          information,
+                          date_hours,
                         });
                       }
                     }

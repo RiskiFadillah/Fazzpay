@@ -12,15 +12,15 @@ const authModel = {
           return reject(err.message);
         } else {
           if (result.rows.length == 0) {
-            return reject("email/password salah 1"); //ketika username salah
+            return reject("Wrong Email or Password"); //ketika username salah
           } else {
             bcrypt.compare(
               password,
               result.rows[0].password,
               function (err, hashingResult) {
-                if (err) return reject("email/password salah 2"); //ketika kesalaahan hashing bycrypt
+                if (err) return reject("Wrong Email or Password"); //ketika kesalaahan hashing bycrypt
                 if (!hashingResult) {
-                  return reject("username/password salah 3");
+                  return reject("Wrong Email or Password");
                 } else {
                   return resolve(result.rows[0]); //ketika password salah
                 }
@@ -31,109 +31,100 @@ const authModel = {
       });
     });
   },
-  register: ({ firstname, lastname, email, password }) => {
-    console.log(firstname, lastname, email, password);
+  register: ({ id_users, first_name, email, password }) => {
     return new Promise((resolve, reject) => {
       db.query(
-        `INSERT INTO users (id_users,first_name,last_name,email,password) VALUES($1,$2,$3,$4,$5)`,
-        [uuidv4(), firstname, lastname, email, password],
+        `INSERT INTO users (id_users, first_name, email, password) VALUES($1, $2, $3, $4)`,
+        [uuidv4(), first_name, email, password],
         (err, result) => {
           if (err) {
-            return reject(err);
+            console.log(err);
+            return reject(err.message);
           } else {
-            return resolve("ADD_SUCCESS", result);
+            db.query(
+              `SELECT * FROM users WHERE email=$1`,
+              [email],
+              (err, result) => {
+                if (err) {
+                  return reject(err.message);
+                } else {
+                  return resolve(result.rows[0]);
+                }
+              }
+            );
           }
         }
       );
     });
   },
 
-  // get: function (queryParams) {
-  //   console.log(queryParams);
-  //   return new Promise((resolve, reject) => {
-  //     db.query(`SELECT * FROM usersauth`, (err, result) => {
-  //       if (err) {
-  //         return reject(err.message);
-  //       } else {
-  //         return resolve(result.rows);
-  //       }
-  //     });
-  //   });
-  // },
-  // getDetail: (id) => {
-  //   return new Promise((resolve, reject) => {
-  //     db.query(`SELECT * from usersauth WHERE id='${id}'`, (err, result) => {
-  //       if (err) {
-  //         return reject(err.message);
-  //       } else {
-  //         return resolve(result.rows[0]);
-  //       }
-  //     });
-  //   });
-  // },
+  createPin: function ({ id_users, pin }) {
+    console.log(pin);
+    return new Promise((resolve, reject) => {
+      db.query(
+        `SELECT pin FROM users WHERE id_users ='${id_users}'`,
+        (error, dataRes) => {
+          console.log(dataRes, "model 1");
+          if (error) {
+            return reject(error.message);
+          } else {
+            if (dataRes.rows.length == 0) {
+              return reject("Id not found!");
+            } else {
+              console.log(dataRes.rows[0], "model 2");
+              db.query(
+                `UPDATE users SET pin='${
+                  pin || dataRes.rows[0].pin
+                }'WHERE id_users='${id_users}'`,
+                (error) => {
+                  if (error) {
+                    return reject(error.message);
+                  } else {
+                    return resolve({
+                      id_users,
+                      pin,
+                    });
+                  }
+                }
+              );
+            }
+          }
+        }
+      );
+    });
+  },
 
-  // update: ({ id, firstname, lastname, email, phone_numbers, balance }) => {
-  //   return new Promise((resolve, reject) => {
-  //     db.query(`SELECT * FROM usersauth WHERE id='${id}'`, (err, result) => {
-  //       if (err) {
-  //         return reject(err.message);
-  //       } else {
-  //         db.query(
-  //           `UPDATE usersauth SET firstname='${
-  //             firstname || result.rows[0].firstname
-  //           }', lastname='${lastname || result.rows[0].lastname}', email='${
-  //             email || result.rows[0].email
-  //           }', phone_numbers='${
-  //             phone_numbers || result.rows[0].phone_numbers
-  //           }', balance='${balance || result.rows[0].balance}'WHERE id='${id}'
-  //           `,
-  //           (err, result) => {
-  //             if (err) {
-  //               return reject(err.message);
-  //             } else {
-  //               return resolve({
-  //                 id,
-  //                 firstname,
-  //                 lastname,
-  //                 email,
-  //                 phone_numbers,
-  //                 balance,
-  //               });
-  //             }
-  //           }
-  //         );
-  //       }
-  //     });
-  //   });
-  // },
-
-  // topup: ({ id, balance }) => {
-  //   return new Promise((resolve, reject) => {
-  //     db.query(`SELECT * FROM usersauth WHERE id='${id}'`, (err, result) => {
-  //       if (err) {
-  //         return reject(err.message);
-  //       } else {
-  //         console.log(result);
-  //         db.query(
-  //           `UPDATE usersauth SET balance = ${
-  //             parseInt(result.rows[0].balance) + parseInt(balance)
-  //           } WHERE id='${id}'
-  //           `,
-  //           (errTopup, resultTopup) => {
-  //             if (errTopup) {
-  //               return reject(errTopup.message);
-  //             } else {
-  //               return resolve({
-  //                 id,
-  //                 balance,
-  //               });
-  //             }
-  //           }
-  //         );
-  //       }
-  //     });
-  //   });
-  // },
+  confirmPin: ({ id_users, pin }) => {
+    console.log(pin);
+    return new Promise((resolve, reject) => {
+      db.query(
+        `SELECT * FROM users WHERE id_users=$1`,
+        [id_users],
+        (err, result) => {
+          if (err) {
+            return reject(err.message);
+          } else {
+            if (result.rows.length == 0) {
+              return reject("pin salah 1"); //ketika username salah
+            } else {
+              bcrypt.compare(
+                pin,
+                result.rows[0].pin,
+                function (err, hashingResult) {
+                  if (err) return reject("pin salah 2"); //ketika kesalaahan hashing bycrypt
+                  if (!hashingResult) {
+                    return reject("pin salah 3");
+                  } else {
+                    return resolve(result.rows[0]); //ketika password salah
+                  }
+                }
+              );
+            }
+          }
+        }
+      );
+    });
+  },
 };
 
 module.exports = authModel;
